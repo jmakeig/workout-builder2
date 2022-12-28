@@ -1,5 +1,11 @@
 {
 	"name": "workout-builder2",
+	"features": {
+		"node": {
+			"version": "lts",
+			"nodeGypDependencies": true
+		}
+	},
 	"settings": {
 		"workbench.colorTheme": "Dracula",
 		"editor.tabSize": 2,
@@ -26,11 +32,5 @@
 		"mtxr.sqltools-driver-pg",
 		"google-cloud-spanner-ecosystem.google-cloud-spanner-driver",
 		"IronGeek.vscode-env"
-	],
-	"features": {
-		"node": {
-			"version": "lts",
-			"nodeGypDependencies": true
-		}
-	}
+	]
 }

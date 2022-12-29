@@ -1,6 +1,7 @@
 const SIMULATED_DELAY = 250; // ms
 function delay(ms = 0) {
 	const wait = Math.max(0, ms + 250 * (Math.random() - 0.5));
+	// const wait = 0;
 	console.log(`Waiting ${wait.toFixed(0).toLocaleString()}ms`);
 	return new Promise((resolve) => setTimeout(resolve, wait));
 }

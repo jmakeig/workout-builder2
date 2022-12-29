@@ -9,6 +9,6 @@
 
 <ul>
 	{#each data.workouts as workout}
-		<li><a href="/workouts/{workout.name}">{workout.name}</a></li>
+		<li><a href="/workouts/{workout.name}">{workout.title}</a></li>
 	{/each}
 </ul>

@@ -1,3 +1,4 @@
+import { redirect } from '@sveltejs/kit';
 import { api } from '$lib/server/api/local';
 
 /** @type {import('./$types').PageServerLoad} */
@@ -9,8 +10,9 @@ export async function load({ params }) {
 
 /** @type {import('./$types').Actions} */
 export const actions = {
-	default: async ({ request }) => {
-		return api.updateWorkout(toWorkout(await request.formData()));
+	async default({ request }) {
+		const workout = await api.updateWorkout(toWorkout(await request.formData()));
+		throw redirect(303, `/workouts/${workout.name}`);
 	}
 };
 

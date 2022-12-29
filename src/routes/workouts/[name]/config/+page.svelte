@@ -19,4 +19,5 @@
 	</div>
 	<div>{data.workout.sets.length}</div>
 	<button>Save</button>
+	<a href="/workouts/{data.workout.name}">Cancel</a>
 </form>

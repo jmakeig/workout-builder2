@@ -3,7 +3,7 @@
 * `/workouts`: List all workouts for a given user
 	* `./new`: Create a workout
 		* GET: Data entry
-		* POST: Save -> redirect to `./[name]/config`
+		* POST: Save stub -> redirects to `./[name]/config` for editing with sets
 	* `./[name]`: Run a workout
 		* GET
 		* `./config`: Configure a single workout

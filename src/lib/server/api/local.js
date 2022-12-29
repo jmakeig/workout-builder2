@@ -23,6 +23,15 @@ const db = {
 	async update(str, params = {}) {
 		await delay(750);
 		switch (str) {
+			case 'INSERT INTO workouts VALUES ($stub)':
+				console.log('Updating', params);
+				const newWorkout = { name: nameFromTitle(params.stub.title), sets: [], ...params.stub };
+				if (data.findIndex((workout) => newWorkout.name === workout.name) >= 0) {
+					console.warn('Constraint violation', data);
+					throw new Error(`Constraint violation: Workout '${newWorkout.name}' already exists`);
+				}
+				data.push(newWorkout);
+				return newWorkout;
 			case 'UPDATE workouts WHERE name = $name':
 				console.log('Updating', params.workout);
 				const index = data.findIndex((workout) => params.workout.name === workout.name);
@@ -33,12 +42,38 @@ const db = {
 	}
 };
 
+/**
+ * Turns a string into a URL-ready slug
+ *
+ * @param {string} title
+ * @returns {string}
+ */
+function nameFromTitle(title) {
+	const maxLength = 80;
+	let len = 0,
+		index = 0,
+		slug = '';
+	const tokens = title.split(/\W+/g);
+	while (len < maxLength && index < tokens.length) {
+		len += tokens[index].length;
+		if (tokens[index].length > 0) {
+			slug += (index > 0 ? '-' : '') + tokens[index++];
+		} else {
+			index++;
+		}
+	}
+	return slug;
+}
+
 export const api = {
 	async listWorkouts() {
 		return db.query('SELECT FROM workouts');
 	},
 	async findWorkout(name) {
 		return db.query('SELECT FROM workouts WHERE name = $name', { name });
+	},
+	async createWorkout(stub) {
+		return db.update('INSERT INTO workouts VALUES ($stub)', { stub });
 	},
 	async updateWorkout(workout) {
 		return db.update('UPDATE workouts WHERE name = $name', { workout });

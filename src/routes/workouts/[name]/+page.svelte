@@ -4,6 +4,11 @@
 </script>
 
 <h1>{data.workout.title}</h1>
-<a href="/workouts/{data.workout.name}/config">Edit</a>
+<div><a href="/workouts/{data.workout.name}/config">Edit</a></div>
+<p>Description</p>
+<h2>Sets</h2>
+{#each data.workout.sets as set}
+	{set.toString()}
+{/each}
 
-<div><a href="/workouts">Workouts</a></div>
+<nav><ul><li><a href="/workouts">Workouts</a></li></ul></nav>

@@ -76,7 +76,7 @@ function name_from_title(title) {
 	while (len < maxLength && index < tokens.length) {
 		len += tokens[index].length;
 		if (tokens[index].length > 0) {
-			slug += (index > 0 ? '-' : '') + tokens[index++];
+			slug += (index > 0 ? '-' : '') + tokens[index++].toLowerCase();
 		} else {
 			index++;
 		}
@@ -90,7 +90,11 @@ export const api = {
 		return db.query('SELECT FROM workouts');
 	},
 	async find_workout(name) {
-		return db.query('SELECT FROM workouts WHERE name = $name', { name });
+		const workout = await db.query('SELECT FROM workouts WHERE name = $name', { name });
+		if (workout === undefined) {
+			throw new Error(`Workout not found for name: ${name}`);
+		}
+		return workout;
 	},
 	async create_workout(stub) {
 		return db.update('INSERT INTO workouts VALUES ($stub)', { stub });

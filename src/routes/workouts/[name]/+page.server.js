@@ -1,8 +1,8 @@
-import { api } from '$lib/server/api/local';
+import { api } from '$lib/server/api/impl';
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ params }) {
 	return {
-		workout: await api.findWorkout(params.name)
+		workout: await api.find_workout(params.name)
 	};
 }

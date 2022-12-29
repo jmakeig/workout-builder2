@@ -1,4 +1,8 @@
 const SIMULATED_DELAY = 250; // ms
+/**
+ * @param {number} ms
+ * @returns {Promise<any>}
+ */
 function delay(ms = 0) {
 	const wait = Math.max(0, ms + 250 * (Math.random() - 0.5));
 	// const wait = 0;
@@ -6,9 +10,18 @@ function delay(ms = 0) {
 	return new Promise((resolve) => setTimeout(resolve, wait));
 }
 
+/** @typedef { import('$lib/types').Workout } Workout */
+
+/** @type {Workout[]} */
 const data = [{ name: 'uno', title: 'Uno', description: '', sets: [] }];
 
 const db = {
+	/**
+	 *
+	 * @param {string} str
+	 * @param {any} params
+	 * @returns {Promise<Workout[] | Workout | undefined>}
+	 */
 	async query(str, params = {}) {
 		await delay(250);
 		switch (str) {
@@ -20,12 +33,18 @@ const db = {
 				throw new Error(str);
 		}
 	},
+	/**
+	 *
+	 * @param {string} str
+	 * @param {any} params
+	 * @returns {Promise<Workout>}
+	 */
 	async update(str, params = {}) {
 		await delay(750);
 		switch (str) {
 			case 'INSERT INTO workouts VALUES ($stub)':
 				console.log('Updating', params);
-				const newWorkout = { name: nameFromTitle(params.stub.title), sets: [], ...params.stub };
+				const newWorkout = { name: name_from_title(params.stub.title), sets: [], ...params.stub };
 				if (data.findIndex((workout) => newWorkout.name === workout.name) >= 0) {
 					console.warn('Constraint violation', data);
 					throw new Error(`Constraint violation: Workout '${newWorkout.name}' already exists`);
@@ -48,7 +67,7 @@ const db = {
  * @param {string} title
  * @returns {string}
  */
-function nameFromTitle(title) {
+function name_from_title(title) {
 	const maxLength = 80;
 	let len = 0,
 		index = 0,
@@ -65,17 +84,18 @@ function nameFromTitle(title) {
 	return slug;
 }
 
+/** @type {import('./api').API} */
 export const api = {
-	async listWorkouts() {
+	async list_workouts() {
 		return db.query('SELECT FROM workouts');
 	},
-	async findWorkout(name) {
+	async find_workout(name) {
 		return db.query('SELECT FROM workouts WHERE name = $name', { name });
 	},
-	async createWorkout(stub) {
+	async create_workout(stub) {
 		return db.update('INSERT INTO workouts VALUES ($stub)', { stub });
 	},
-	async updateWorkout(workout) {
+	async update_workout(workout) {
 		return db.update('UPDATE workouts WHERE name = $name', { workout });
 	}
 };

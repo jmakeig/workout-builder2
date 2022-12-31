@@ -29,11 +29,8 @@
 		/>
 	</div>
 	<div>
-		<label for="description">Description</label><input
-			id="description"
-			name="description"
-			bind:value={data.workout.description}
-		/>
+		<label for="description">Description</label>
+		<input id="description" name="description" bind:value={data.workout.description} />
 	</div>
 	<!-- https://remix.run/docs/en/v1/pages/faq#how-can-i-have-structured-data-in-a-form -->
 	<!-- const queryString = new URLSearchParams(new FormData(myForm)).toString() -->

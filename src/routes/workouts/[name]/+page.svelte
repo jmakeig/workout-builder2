@@ -1,13 +1,15 @@
 <script>
 	/** @type {import('./$types').PageData} */
 	export let data;
+	$: ({ workout } = data);
 </script>
 
 <h1>{data.workout.title}</h1>
-<div><a href="/workouts/{data.workout.name}/config">Edit</a></div>
-<p>Description</p>
+<div><a href="/workouts/{workout.name}/config">Edit</a></div>
+<p>{workout.description}</p>
+
 <h2>Sets</h2>
-{#each data.workout.sets as set}
+{#each workout.sets as set}
 	{set.toString()}
 {/each}
 

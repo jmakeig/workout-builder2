@@ -25,8 +25,11 @@ export const actions = {
  */
 function to_workout(formData) {
 	return {
+		/** @type any */
 		name: formData.get('name'),
+		/** @type any */
 		title: formData.get('title'),
+		/** @type any */
 		description: formData.get('description'),
 		sets: []
 	};

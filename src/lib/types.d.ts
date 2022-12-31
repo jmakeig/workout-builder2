@@ -1,14 +1,17 @@
 /** A workout has some identifying metadata and a set of exercises */
-export interface Workout {
+export interface Workout extends WorkoutStub {
 	/** The unique, human-readable, URL-compatible identifier. Usually of the form `some-name-here`. */
 	name: string;
+	/** The groups of exercises */
+	sets: ExerciseSet[];
+	// rest_duration: number;
+}
+
+export interface WorkoutStub {
 	/** The readable label  */
 	title: string;
 	/** A short characterization */
 	description: string;
-	/** The groups of exercises */
-	sets: ExerciseSet[];
-	// rest_duration: number;
 }
 
 interface ExerciseSet {

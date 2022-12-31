@@ -1,12 +1,12 @@
 import { redirect } from '@sveltejs/kit';
-import { api } from '$lib/server/api/local';
+import { api } from '$lib/server/api/impl';
 
-/** @type {import('./$types').PageServerLoad} */
-export async function load({ params }) {
-	return {
-		workout: await api.find_workout(params.name)
-	};
-}
+///** @type {import('./$types').PageServerLoad} */
+// export async function load({ params }) {
+// 	return {
+// 		…
+// 	};
+// }
 
 /** @type {import('./$types').Actions} */
 export const actions = {
@@ -17,13 +17,15 @@ export const actions = {
 };
 
 /**
- * 
- * @param {FormData} formData 
- * @returns {import('$lib/server/api/api').WorkoutStub}
+ *
+ * @param {FormData} formData
+ * @returns {import('$lib/types').WorkoutStub}
  */
 function to_workout_stub(formData) {
 	return {
+		/** @type any */
 		title: formData.get('title'),
+		/** @type any */
 		description: formData.get('description')
 	};
 }

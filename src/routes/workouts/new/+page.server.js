@@ -1,18 +1,20 @@
-import { redirect } from '@sveltejs/kit';
-import { api } from '$lib/server/api/impl';
-
-///** @type {import('./$types').PageServerLoad} */
-// export async function load({ params }) {
-// 	return {
-// 		…
-// 	};
-// }
+import { redirect, fail } from '@sveltejs/kit';
+import { api, ValidationError } from '$lib/server/api/impl';
 
 /** @type {import('./$types').Actions} */
 export const actions = {
 	async default({ request }) {
-		const workout = await api.create_workout(to_workout_stub(await request.formData()));
-		throw redirect(303, `/workouts/${workout.name}/config`);
+		const stub = to_workout_stub(await request.formData());
+		try {
+			const workout = await api.create_workout(stub);
+			throw redirect(303, `/workouts/${workout.name}/config`);
+		} catch (error) {
+			if (error instanceof ValidationError) {
+				console.warn('ConstraintViolationError');
+				return fail(409, { stub, message: `Nope` });
+			}
+			throw error;
+		}
 	}
 };
 

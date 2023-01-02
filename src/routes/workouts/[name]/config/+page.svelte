@@ -90,7 +90,7 @@
 		</fieldset>
 	{/each}
 	<div class="form-actions">
-		<button>Save</button>
+		<button formaction="?/save">Save</button>
 		<button
 			type="button"
 			on:click={(evt) => {
@@ -98,6 +98,7 @@
 				tmp = [...tmp, []];
 			}}>Add Set</button
 		>
+		<button formaction="?/delete">Delete</button>
 	</div>
 	<nav>
 		<ul>

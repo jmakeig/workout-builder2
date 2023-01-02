@@ -5,6 +5,7 @@ export interface API {
 	find_workout: (name: string) => Promise<Workout>;
 	update_workout: (workout: Workout) => Promise<Workout>;
 	create_workout: (workout: WorkoutStub) => Promise<Workout>;
+	delete_workout: (name: string) => Promise<>;
 	// validate_workout: (item: Item) => Promise<Validation[]>;
 	// close: () => void;
 }

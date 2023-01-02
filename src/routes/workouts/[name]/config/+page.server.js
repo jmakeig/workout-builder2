@@ -1,18 +1,36 @@
-import { redirect } from '@sveltejs/kit';
-import { api } from '$lib/server/api/impl';
+import { error as throwable_error, redirect } from '@sveltejs/kit';
+import { api, ValidationError } from '$lib/server/api/impl';
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ params }) {
-	return {
-		workout: await api.find_workout(params.name)
-	};
+	try {
+		const workout = await api.find_workout(params.name);
+		return { workout };
+	} catch (error) {
+		console.warn(error);
+		if (error instanceof ValidationError) {
+			throw throwable_error(404);
+		}
+		throw error;
+	}
 }
 
 /** @type {import('./$types').Actions} */
 export const actions = {
-	async default({ request }) {
-		const workout = await api.update_workout(to_workout(await request.formData()));
-		throw redirect(303, `/workouts/${workout.name}`);
+	async save({ request }) {
+		return api
+			.update_workout(to_workout(await request.formData()))
+			.then((workout) => {
+				throw redirect(303, `/workouts/${workout.name}`);
+			})
+			.catch((error) => {
+				console.error('CAUGHT!');
+			});
+	},
+	async delete(event) {
+		console.log(event.params);
+		await api.delete_workout(event.params.name);
+		throw redirect(303, `/workouts`);
 	}
 };
 

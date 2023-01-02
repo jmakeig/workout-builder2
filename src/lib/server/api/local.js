@@ -1,4 +1,8 @@
+import { ConstraintViolationError, NotFoundError } from './impl';
+import { error } from '@sveltejs/kit';
+
 const SIMULATED_DELAY = 250; // ms
+
 /**
  * @param {number} ms
  * @returns {Promise<any>}
@@ -37,26 +41,34 @@ const db = {
 	 *
 	 * @param {string} str
 	 * @param {any} params
-	 * @returns {Promise<Workout>}
+	 * @returns {Promise<Workout | undefined>}
+	 * @throws ConstraintViolationError
 	 */
 	async update(str, params = {}) {
 		await delay(750);
 		switch (str) {
 			case 'INSERT INTO workouts VALUES ($stub)':
 				console.log('Updating', params);
-				const newWorkout = { name: name_from_title(params.stub.title), sets: [], ...params.stub };
-				if (data.findIndex((workout) => newWorkout.name === workout.name) >= 0) {
-					console.warn('Constraint violation', data);
-					throw new Error(`Constraint violation: Workout '${newWorkout.name}' already exists`);
+				const stub = { name: name_from_title(params.stub.title), sets: [], ...params.stub };
+				if (data.findIndex((workout) => stub.name === workout.name) >= 0) {
+					throw new ConstraintViolationError(
+						`Constraint violation: Workout '${stub.name}' already exists`,
+						stub
+					);
 				}
-				data.push(newWorkout);
-				return newWorkout;
+				data.push(stub);
+				return stub;
 			case 'UPDATE workouts WHERE name = $name':
 				console.log('Updating', params.workout);
 				const index = data.findIndex((workout) => params.workout.name === workout.name);
 				return (data[index] = params.workout);
+			case 'DELETE FROM workouts WHERE name = $name': {
+				const index = data.findIndex((workout) => params.name === workout.name);
+				data.splice(index, 1);
+				return;
+			}
 			default:
-				throw new Error(str);
+				throw new Error(`Invalid SQL: '${str}'`);
 		}
 	}
 };
@@ -92,7 +104,7 @@ export const api = {
 	async find_workout(name) {
 		const workout = await db.query('SELECT FROM workouts WHERE name = $name', { name });
 		if (workout === undefined) {
-			throw new Error(`Workout not found for name: ${name}`);
+			throw new NotFoundError(`Workout not found for name: ${name ?? ''}`);
 		}
 		return workout;
 	},
@@ -101,5 +113,8 @@ export const api = {
 	},
 	async update_workout(workout) {
 		return db.update('UPDATE workouts WHERE name = $name', { workout });
+	},
+	async delete_workout(name) {
+		return db.update('DELETE FROM workouts WHERE name = $name', { name });
 	}
 };

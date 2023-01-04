@@ -99,20 +99,35 @@ function name_from_title(title) {
 /** @type {import('./api').API} */
 export const api = {
 	async list_workouts() {
-		return db.query('SELECT FROM workouts');
+		const workouts = await db.query('SELECT FROM workouts');
+		if (undefined === workouts || !Array.isArray(workouts)) {
+			throw new Error('Unexpected database response');
+		}
+		return workouts;
 	},
 	async find_workout(name) {
 		const workout = await db.query('SELECT FROM workouts WHERE name = $name', { name });
-		if (workout === undefined) {
+		if (undefined === workout) {
 			throw new NotFoundError(`Workout not found for name: ${name ?? ''}`);
+		}
+		if (Array.isArray(workout)) {
+			throw new Error('Unexpected database response');
 		}
 		return workout;
 	},
 	async create_workout(stub) {
-		return db.update('INSERT INTO workouts VALUES ($stub)', { stub });
+		const workout = await db.update('INSERT INTO workouts VALUES ($stub)', { stub });
+		if (undefined === workout) {
+			throw new Error('Unexpected database response');
+		}
+		return workout;
 	},
 	async update_workout(workout) {
-		return db.update('UPDATE workouts WHERE name = $name', { workout });
+		const result = await db.update('UPDATE workouts WHERE name = $name', { workout });
+		if (undefined === result) {
+			throw new Error('Unexpected database response');
+		}
+		return result;
 	},
 	async delete_workout(name) {
 		return db.update('DELETE FROM workouts WHERE name = $name', { name });

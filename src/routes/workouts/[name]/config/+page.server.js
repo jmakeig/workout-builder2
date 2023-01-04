@@ -1,17 +1,17 @@
-import { error as throwable_error, redirect } from '@sveltejs/kit';
-import { api, ValidationError } from '$lib/server/api/impl';
+import { error, redirect } from '@sveltejs/kit';
+import { api, NotFoundError, ValidationError } from '$lib/server/api/impl';
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ params }) {
 	try {
 		const workout = await api.find_workout(params.name);
 		return { workout };
-	} catch (error) {
-		console.warn(error);
-		if (error instanceof ValidationError) {
-			throw throwable_error(404);
+	} catch (err) {
+		console.warn(err);
+		if (err instanceof NotFoundError) {
+			throw error(404);
 		}
-		throw error;
+		throw err;
 	}
 }
 

@@ -10,7 +10,7 @@ export const actions = {
 			throw redirect(303, `/workouts/${workout.name}/config`);
 		} catch (error) {
 			if (error instanceof ValidationError) {
-				console.warn('ConstraintViolationError');
+				console.warn(error?.constructor.name);
 				return fail(409, { stub, message: `Nope` });
 			}
 			throw error;

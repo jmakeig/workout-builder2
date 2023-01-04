@@ -15,6 +15,12 @@
 			{ exercise: { name: 'toe-touch', title: 'Toe Touch' }, duration: 30 }
 		]
 	];
+
+	/* 
+		States:
+			Empty
+			SufficientSet
+	*/
 </script>
 
 <h1>Edit: {data.workout.title}</h1>
@@ -30,41 +36,51 @@
 	</div>
 	<div>
 		<label for="description">Description</label>
-		<input id="description" name="description" bind:value={data.workout.description} />
+		<textarea id="description" name="description" bind:value={data.workout.description} />
 	</div>
 	<!-- https://remix.run/docs/en/v1/pages/faq#how-can-i-have-structured-data-in-a-form -->
 	<!-- const queryString = new URLSearchParams(new FormData(myForm)).toString() -->
 	{#each tmp as set, s}
 		<fieldset>
 			<legend>Set {s + 1}</legend>
-			{#each set as instance, i}
-				<div>
-					<label for="set{s}-exercise{i}">Exercise</label>
-					{instance.exercise.name}
-					<select
-						id="sets[{s}][{i}].exercise"
-						name="sets[{s}][{i}]"
-						bind:value={instance.exercise.name}
-					>
-						<option value="jump">Jump</option>
-						<option value="squat">Squat</option>
-						<option value="run">Run</option>
-						<option value="plank">Plank</option>
-						<option value="jumping-jack">Jumping Jack</option>
-						<option value="push-up">Push-up</option>
-						<option value="toe-touch">Toe Touch</option>
-					</select>
-					<label for="sets[{s}][{i}]">Duration</label>
-					<input
-						type="number"
-						id="sets[{s}][{i}].duration"
-						name="sets[{s}][{i}].duration"
-						min="1"
-						max="500"
-						bind:value={instance.duration}
-					/>
-				</div>
-			{/each}
+			<table>
+				<thead>
+					<tr><th scope="column">Exercise</th><th scope="column">Duration</th></tr>
+				</thead>
+				<tbody>
+					{#each set as instance, i}
+						<tr>
+							<td>
+								<select
+									id="sets[{s}][{i}].exercise"
+									name="sets[{s}][{i}]"
+									bind:value={instance.exercise.name}
+								>
+									<option value="jump">Jump</option>
+									<option value="squat">Squat</option>
+									<option value="run">Run</option>
+									<option value="plank">Plank</option>
+									<option value="jumping-jack">Jumping Jack</option>
+									<option value="push-up">Push-up</option>
+									<option value="toe-touch">Toe Touch</option>
+								</select></td
+							>
+							<td>
+								<input
+									type="number"
+									id="sets[{s}][{i}].duration"
+									name="sets[{s}][{i}].duration"
+									min="1"
+									max="500"
+									bind:value={instance.duration}
+								/>
+								{#if 0 === i} seconds{/if}
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+			<div class="form-actions"><button type="button">Add exercise</button></div>
 			<!--
 			<div>
 				<label for="set0-exercise1">Exercise</label>
@@ -89,8 +105,7 @@
 			-->
 		</fieldset>
 	{/each}
-	<div class="form-actions">
-		<button formaction="?/save">Save</button>
+	<div>
 		<button
 			type="button"
 			on:click={(evt) => {
@@ -98,6 +113,10 @@
 				tmp = [...tmp, []];
 			}}>Add Set</button
 		>
+	</div>
+	<div class="form-actions">
+		<button formaction="?/save">Save</button>
+
 		<button formaction="?/delete">Delete</button>
 	</div>
 	<nav>

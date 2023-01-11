@@ -10,7 +10,7 @@
 	
 	/**
 	 * @param {HTMLInputElement} node
-	 * @param {(value: unknown) => unknown} updater
+	 * @param {(value: any) => any} updater
 	 * @returns {{destroy: () => void}}
 	 */
 	function deep(node, updater) {
@@ -25,6 +25,7 @@
 		};
 	}
 
+	/*
 	let data = {
 		workout: {
 			name: 'asdf',
@@ -40,7 +41,12 @@
 			]
 		}
 	};
+	*/
 
+	export let data;
+
+	/** @typedef {import("$lib/types").Workout} Workout */
+	/** @type {import("svelte/store").Writable<Workout>} */
 	const workout = writable(data.workout);
 	//const validations = derived(workout, $w => []);
 	const validations = derived_async(workout, validate_workout);

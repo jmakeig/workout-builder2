@@ -14,9 +14,7 @@ export interface WorkoutStub {
 	description: string;
 }
 
-interface ExerciseSet {
-	exercises: ExerciseInstance[];
-}
+interface ExerciseSet extends Array<ExerciseInstance> {}
 
 interface ExerciseInstance {
 	exercise: Exercise;

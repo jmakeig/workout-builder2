@@ -3,7 +3,7 @@
  * @param {import('./l10n').Message} message
  * @param {string} [fallback = '']
  * @param {import('./l10n').Lang} [language = 'en']
- * @returns
+ * @returns {string}
  */
 export function local(message, fallback = '', language) {
 	if ('string' === typeof message) return message;

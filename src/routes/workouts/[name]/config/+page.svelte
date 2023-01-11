@@ -1,129 +1,183 @@
+<!--svelte:options immutable={true}/-->
 <script>
-	/** @type {import('./$types').PageData} */
-	export let data;
+	// https://svelte.dev/repl/7fccf657414f47749a0272f52aceb4f1?version=3.55.1
+	import { writable } from 'svelte/store';
+	import { derived_async } from '$lib/state';
+	import { validate_workout, valid, named } from '$lib/validation';
 
-	let tmp = [
-		[
-			{ exercise: { name: 'jump', title: 'Jump' }, duration: 30 },
-			{ exercise: { name: 'squat', title: 'Squat' }, duration: 30 },
-			{ exercise: { name: 'run', title: 'Run' }, duration: 30 }
-		],
-		[
-			{ exercise: { name: 'plank', title: 'Plank' }, duration: 30 },
-			{ exercise: { name: 'jumping-jack', title: 'Jumping Jack' }, duration: 30 },
-			{ exercise: { name: 'push-up', title: 'Push-up' }, duration: 30 },
-			{ exercise: { name: 'toe-touch', title: 'Toe Touch' }, duration: 30 }
-		]
-	];
+	// TODO: Do I even need this? It’s just on:input={evt => updater(evt.target.value)}.
+	//       Is the deep update logic generalizable?
+	
+	/**
+	 * @param {HTMLInputElement} node
+	 * @param {(value: unknown) => unknown} updater
+	 * @returns {{destroy: () => void}}
+	 */
+	function deep(node, updater) {
+		function input_listener() {
+			return updater(node.value);
+		}
+		node.addEventListener('input', input_listener);
+		return {
+			destroy() {
+				node.removeEventListener('input', input_listener);
+			}
+		};
+	}
 
-	/* 
-		States:
-			Empty
-			SufficientSet
-	*/
+	let data = {
+		workout: {
+			name: 'asdf',
+			title: 'Asdf',
+			description: 'Here is some long-form text to describe it.',
+			sets: [
+				[
+					{ exercise: 'jump', duration: 30 },
+					{ exercise: 'run', duration: 60 },
+					{ exercise: 'jumping-jack', duration: 30 }
+				],
+				[{ exercise: 'jump', duration: 15 }]
+			]
+		}
+	};
+
+	const workout = writable(data.workout);
+	//const validations = derived(workout, $w => []);
+	const validations = derived_async(workout, validate_workout);
 </script>
 
-<h1>Edit: {data.workout.title}</h1>
-
-<form method="post">
-	<input type="hidden" name="name" value={data.workout.name} />
-	<div>
-		<label for="title">Title</label><input
+<h2>Workout</h2>
+<pre>{JSON.stringify($workout, null, 2)}</pre>
+<!--
+<h2>FormData</h2>
+<pre>{qs}</pre>
+-->
+<form>
+	<div class="control">
+		<label for="title">Title</label>
+		<input
+			type="text"
 			id="title"
 			name="title"
-			bind:value={data.workout.title}
+			bind:value={$workout.title}
+			use:valid={$validations}
 		/>
 	</div>
-	<div>
+	<div class="control">
 		<label for="description">Description</label>
-		<textarea id="description" name="description" bind:value={data.workout.description} />
+		<textarea
+			id="description"
+			name="description"
+			bind:value={$workout.description}
+			use:valid={$validations}
+		/>
 	</div>
-	<!-- https://remix.run/docs/en/v1/pages/faq#how-can-i-have-structured-data-in-a-form -->
-	<!-- const queryString = new URLSearchParams(new FormData(myForm)).toString() -->
-	{#each tmp as set, s}
+	{#each $workout.sets as set, s}
 		<fieldset>
 			<legend>Set {s + 1}</legend>
 			<table>
-				<thead>
-					<tr><th scope="column">Exercise</th><th scope="column">Duration</th></tr>
-				</thead>
+				<thead><tr><th>Exercise</th><th>Duration</th></tr></thead>
 				<tbody>
-					{#each set as instance, i}
+					{#each set as exercise, e}
 						<tr>
 							<td>
+								<!--label for="workout.sets[{s}][{e}].exercise">Exercise</label-->
 								<select
-									id="sets[{s}][{i}].exercise"
-									name="sets[{s}][{i}]"
-									bind:value={instance.exercise.name}
+									id="workout.sets[{s}][{e}].exercise"
+									name="workout.sets[{s}][{e}].exercise"
+									bind:value={exercise.exercise}
 								>
-									<option value="jump">Jump</option>
-									<option value="squat">Squat</option>
 									<option value="run">Run</option>
-									<option value="plank">Plank</option>
+									<option value="jump">Jump</option>
 									<option value="jumping-jack">Jumping Jack</option>
-									<option value="push-up">Push-up</option>
-									<option value="toe-touch">Toe Touch</option>
-								</select></td
-							>
+								</select>
+							</td>
 							<td>
+								<!--label for="workout.sets[{s}][{e}].duration">Exercise</label-->
 								<input
 									type="number"
-									id="sets[{s}][{i}].duration"
-									name="sets[{s}][{i}].duration"
-									min="1"
-									max="500"
-									bind:value={instance.duration}
+									id="workout.sets[{s}][{e}].duration"
+									name="workout.sets[{s}][{e}].duration"
+									value={exercise.duration}
+									min="5"
+									max={60 * 60}
+									step="5"
+									placeholder="seconds"
+									use:deep={(v) => {
+										$workout.sets[s][e].duration = v;
+										$workout.sets = [...$workout.sets];
+									}}
 								/>
-								{#if 0 === i} seconds{/if}
+								{#if 0 === e} seconds {/if}
 							</td>
 						</tr>
 					{/each}
 				</tbody>
 			</table>
-			<div class="form-actions"><button type="button">Add exercise</button></div>
-			<!--
-			<div>
-				<label for="set0-exercise1">Exercise</label>
-				<select id="set0-exercise1" name="set0-exercise">
-					<option value="jump">Jump</option>
-					<option value="squat" selected>Squat</option>
-					<option value="run">Run</option>
-				</select>
-				<label for="set0-duration1">Duration</label>
-				<input type="number" id="set0-duration1" name="set0-duration" min="1" max="500" />
-			</div>
-			<div>
-				<label for="set0-exercise2">Exercise</label>
-				<select id="set0-exercise2" name="set0-exercise">
-					<option value="jump">Jump</option>
-					<option value="squat">Squat</option>
-					<option value="run" selected>Run</option>
-				</select>
-				<label for="set0-duration2">Duration</label>
-				<input type="number" id="set0-duration2" name="set0-duration" min="1" max="500" />
-			</div>
-			-->
 		</fieldset>
 	{/each}
-	<div>
-		<button
-			type="button"
-			on:click={(evt) => {
-				// console.log(evt);
-				tmp = [...tmp, []];
-			}}>Add Set</button
-		>
-	</div>
-	<div class="form-actions">
-		<button formaction="?/save">Save</button>
-
-		<button formaction="?/delete">Delete</button>
-	</div>
-	<nav>
-		<ul>
-			<li>
-				<a href="/workouts/{data.workout.name}">Cancel</a>
-			</li>
-		</ul>
-	</nav>
 </form>
+
+<style>
+	pre {
+		height: 10em;
+		overflow: auto;
+		border: solid 0.5px #ccc;
+	}
+	.control {
+		margin: 1em 0;
+		display: flex;
+		align-items: baseline;
+	}
+	.control > label {
+		width: 8em;
+	}
+	input,
+	textarea,
+	select {
+		font-family: inherit;
+		font-size: inherit;
+		line-height: inherit;
+	}
+	.control > input,
+	/* .control > select, */
+	.control > textarea {
+		flex-grow: auto;
+		width: 100%;
+	}
+	.control > textarea {
+		min-height: 6em;
+	}
+	fieldset {
+		margin: 1em 0;
+		border: solid 0.5px #ccc;
+	}
+	input:not([type]),
+	input[type='text'],
+	textarea {
+		transition-property: background-color, color, border-color;
+		transition-duration: 0.1s;
+		transition-timing-function: ease-in;
+	}
+	input[type='text']:read-only,
+	textarea:read-only {
+		border-color: transparent;
+		pointer-events: none;
+	}
+	input[type='text']:invalid,
+	textarea:invalid {
+		background-color: #ffe4e6;
+		color: #e11d48;
+		border-color: #e11d48;
+	}
+	input[type='number'] {
+		text-align: right;
+	}
+	table th,
+	table td {
+		padding: 0.25em;
+	}
+	table thead th {
+		text-align: left;
+	}
+</style>

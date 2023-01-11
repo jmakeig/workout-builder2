@@ -20,8 +20,10 @@ interface ExerciseSet {
 
 interface ExerciseInstance {
 	exercise: Exercise;
-	// Time to run the exercise in seconds
+	/** Time to run the exercise in seconds  */ 
 	duration: number; // seconds
+	/** Optional comments about the exercise */
+	notes?: string;
 }
 
 export interface Exercise {

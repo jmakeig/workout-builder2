@@ -1,5 +1,4 @@
 import { ConstraintViolationError, NotFoundError } from './impl';
-import { error } from '@sveltejs/kit';
 
 const SIMULATED_DELAY = 250; // ms
 
@@ -8,6 +7,7 @@ const SIMULATED_DELAY = 250; // ms
  * @returns {Promise<any>}
  */
 function delay(ms = 0) {
+	if (0 === ms) return Promise.resolve();
 	const wait = Math.max(0, ms + 250 * (Math.random() - 0.5));
 	// const wait = 0;
 	console.log(`Waiting ${wait.toFixed(0).toLocaleString()}ms`);
@@ -19,6 +19,16 @@ function delay(ms = 0) {
 /** @type {Workout[]} */
 const data = [{ name: 'uno', title: 'Uno', description: '', sets: [] }];
 
+/**
+ * `new` is used in the URL for new workouts
+ *
+ * @param {string} name
+ * @returns {boolean}
+ */
+function is_reserved(name) {
+	return ['new'].includes(name);
+}
+
 const db = {
 	/**
 	 *
@@ -27,7 +37,7 @@ const db = {
 	 * @returns {Promise<Workout[] | Workout | undefined>}
 	 */
 	async query(str, params = {}) {
-		await delay(250);
+		await delay(SIMULATED_DELAY);
 		switch (str) {
 			case 'SELECT FROM workouts':
 				return data;
@@ -45,11 +55,17 @@ const db = {
 	 * @throws ConstraintViolationError
 	 */
 	async update(str, params = {}) {
-		await delay(750);
+		await delay(SIMULATED_DELAY * 3);
 		switch (str) {
 			case 'INSERT INTO workouts VALUES ($stub)':
 				console.log('Updating', params);
 				const stub = { name: name_from_title(params.stub.title), sets: [], ...params.stub };
+				if (is_reserved(stub.name)) {
+					throw new ConstraintViolationError(
+						`Constraint violation: 'new' is a reserved name`,
+						stub
+					);
+				}
 				if (data.findIndex((workout) => stub.name === workout.name) >= 0) {
 					throw new ConstraintViolationError(
 						`Constraint violation: Workout '${stub.name}' already exists`,
@@ -84,7 +100,8 @@ function name_from_title(title) {
 	let len = 0,
 		index = 0,
 		slug = '';
-	const tokens = title.split(/\W+/g);
+	// https://stackoverflow.com/a/66721429
+	const tokens = title.split(/[^\p{L}\p{N}]+/gu);
 	while (len < maxLength && index < tokens.length) {
 		len += tokens[index].length;
 		if (tokens[index].length > 0) {

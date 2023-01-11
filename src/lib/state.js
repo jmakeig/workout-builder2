@@ -7,14 +7,14 @@
  * @template R
  * @typedef {import("svelte/store").Readable<R>} Readable<R>
  */
+/**
+ * @template S
+ * @typedef {import("svelte/store").Subscriber<S>} Subscriber<S>
+ */
 
 /**
  * @template A
  * @typedef { Writable <A> | Readable<A> } AnyStore<A>
- */
-
-/**
- * 
  */
 
 /**
@@ -24,7 +24,7 @@
  * @param {(value: In) => Promise<Out>} transform
  */
 export function derived_async(store, transform) {
-	/** @type {Array<(value: Out) => void>} */
+	/** @type {Array<Subscriber<Out>>}} */
 	let subscribers = [];
 
 	store.subscribe((value) =>
@@ -35,13 +35,13 @@ export function derived_async(store, transform) {
 					f(result);
 				}
 			})
-			.catch((error) => {
-				console.error(error);
-			})
+			// .catch((error) => {
+			// 	console.error(error);
+			// })
 	); // TODO: .catch()
 	return {
 		/**
-		 * @param {(value: Out) => void} f
+		 * @param {Subscriber<Out>} f
 		 * @returns {() => void }
 		 */
 		subscribe(f) {

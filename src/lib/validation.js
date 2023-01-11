@@ -1,9 +1,9 @@
 /** @typedef {import("$lib/types").Workout} Workout */
 /** @typedef {import("$lib/types").WorkoutStub} WorkoutStub */
-/** @typedef {"en" | "fr" | "de" | "jp" | "zh" | "he"} Lang */
-/** @typedef {{for: string, message: string | {[L in Lang]?: string}}} ValidationResult */
+/** @typedef {import("$lib/l10n").Message} Message */
+/** @typedef {{for: string, message: Message}} ValidationResult */
 
-import { local } from "./l10n";
+import { local } from './l10n';
 
 /**
  *

@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import { api, NotFoundError, ValidationError } from '$lib/server/api/impl';
-import { construct_svelte_component } from 'svelte/internal';
+import { parse } from 'qs';
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ params }) {
@@ -19,7 +19,6 @@ export async function load({ params }) {
 /** @type {import('./$types').Actions} */
 export const actions = {
 	async save({ request }) {
-		console.log('save');
 		return api
 			.update_workout(to_workout(await request.formData()))
 			.then((workout) => {
@@ -30,7 +29,6 @@ export const actions = {
 			});
 	},
 	async delete(event) {
-		console.log(event.params);
 		await api.delete_workout(event.params.name);
 		throw redirect(303, `/workouts`);
 	}
@@ -44,15 +42,18 @@ export const actions = {
  * @returns {Workout}
  */
 function to_workout(formData) {
-	return {
-		/** @type any */
-		name: formData.get('name'),
-		/** @type any */
-		title: formData.get('title'),
-		/** @type any */
-		description: formData.get('description'),
-		sets: [
-			// TODO
-		]
-	};
+	// @ts-ignore
+	const query_string = new URLSearchParams(formData).toString();
+	/** @type {Workout} */
+	// @ts-ignore
+	const workout = parse(query_string, { allowDots: true });
+
+	// UGLY: Turn duration strings into numbers
+	for (const set of workout.sets) {
+		for (const exercise of set) {
+			exercise.duration = parseInt(String(exercise.duration), 10);
+		}
+	}
+	// @ts-ignore
+	return workout;
 }

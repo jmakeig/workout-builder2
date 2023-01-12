@@ -10,7 +10,7 @@ function delay(ms = 0) {
 	if (0 === ms) return Promise.resolve();
 	const wait = Math.max(0, ms + 250 * (Math.random() - 0.5));
 	// const wait = 0;
-	console.log(`Waiting ${wait.toFixed(0).toLocaleString()}ms`);
+	// console.log(`Waiting ${wait.toFixed(0).toLocaleString()}ms`);
 	return new Promise((resolve) => setTimeout(resolve, wait));
 }
 
@@ -72,7 +72,7 @@ const db = {
 		await delay(SIMULATED_DELAY * 3);
 		switch (str) {
 			case 'INSERT INTO workouts VALUES ($stub)':
-				console.log('Updating', params);
+				// console.log('Updating', params);
 				const stub = { name: name_from_title(params.stub.title), sets: [], ...params.stub };
 				if (is_reserved(stub.name)) {
 					throw new ConstraintViolationError(
@@ -89,7 +89,7 @@ const db = {
 				data.push(stub);
 				return stub;
 			case 'UPDATE workouts WHERE name = $name':
-				console.log('Updating', params.workout);
+				// console.log('Updating', params.workout);
 				const index = data.findIndex((workout) => params.workout.name === workout.name);
 				return (data[index] = params.workout);
 			case 'DELETE FROM workouts WHERE name = $name': {
@@ -154,7 +154,7 @@ export const api = {
 		return workout;
 	},
 	async update_workout(workout) {
-		console.log('updating', workout);
+		console.log('updating', JSON.stringify(workout, null, 2));
 		const result = await db.update('UPDATE workouts WHERE name = $name', { workout });
 		if (undefined === result) {
 			throw new Error('Unexpected database response');

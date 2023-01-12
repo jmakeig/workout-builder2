@@ -92,10 +92,9 @@
 					{#each set as exercise, e}
 						<tr>
 							<td>
-								<!--label for="workout.sets[{s}][{e}].exercise">Exercise</label-->
 								<select
-									id="workout.sets[{s}][{e}].exercise"
-									name="workout.sets[{s}][{e}].exercise"
+									id="sets[{s}][{e}].exercise"
+									name="sets[{s}][{e}].exercise"
 									value={exercise.exercise}
 									use:deep={(v) => {
 										$workout.sets[s][e].exercise = v;
@@ -108,11 +107,10 @@
 								</select>
 							</td>
 							<td>
-								<!--label for="workout.sets[{s}][{e}].duration">Exercise</label-->
 								<input
 									type="number"
-									id="workout.sets[{s}][{e}].duration"
-									name="workout.sets[{s}][{e}].duration"
+									id="sets[{s}][{e}].duration"
+									name="sets[{s}][{e}].duration"
 									value={exercise.duration}
 									min="5"
 									max={60 * 60}

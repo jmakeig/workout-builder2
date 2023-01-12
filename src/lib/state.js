@@ -7,20 +7,16 @@
  * @template R
  * @typedef {import("svelte/store").Readable<R>} Readable<R>
  */
+
 /**
  * @template S
  * @typedef {import("svelte/store").Subscriber<S>} Subscriber<S>
  */
 
 /**
- * @template A
- * @typedef { Writable <A> | Readable<A> } AnyStore<A>
- */
-
-/**
  * @template In
  * @template Out
- * @param {AnyStore<In>} store
+ * @param {Readable<In>} store
  * @param {(value: In) => Promise<Out>} transform
  */
 export function derived_async(store, transform) {
@@ -30,7 +26,6 @@ export function derived_async(store, transform) {
 	store.subscribe((value) =>
 		transform(value)
 			.then((result) => {
-				console.log('sub result', result);
 				for (const f of subscribers) {
 					f(result);
 				}
@@ -45,7 +40,6 @@ export function derived_async(store, transform) {
 		 * @returns {() => void }
 		 */
 		subscribe(f) {
-			console.log('subscribed');
 			subscribers.push(f);
 			return () => {
 				// Is the identity of f sufficient here?

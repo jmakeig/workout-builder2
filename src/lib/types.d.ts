@@ -17,7 +17,7 @@ export interface WorkoutStub {
 interface ExerciseSet extends Array<ExerciseInstance> {}
 
 interface ExerciseInstance {
-	exercise: Exercise;
+	exercise: string | Exercise;
 	/** Time to run the exercise in seconds  */
 	duration: number; // seconds
 	/** Optional comments about the exercise */

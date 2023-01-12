@@ -1,5 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import { api, NotFoundError, ValidationError } from '$lib/server/api/impl';
+import { construct_svelte_component } from 'svelte/internal';
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ params }) {
@@ -18,13 +19,14 @@ export async function load({ params }) {
 /** @type {import('./$types').Actions} */
 export const actions = {
 	async save({ request }) {
+		console.log('save');
 		return api
 			.update_workout(to_workout(await request.formData()))
 			.then((workout) => {
 				throw redirect(303, `/workouts/${workout.name}`);
 			})
 			.catch((error) => {
-				console.error('CAUGHT!');
+				console.error('CAUGHT!', error);
 			});
 	},
 	async delete(event) {
@@ -49,6 +51,8 @@ function to_workout(formData) {
 		title: formData.get('title'),
 		/** @type any */
 		description: formData.get('description'),
-		sets: []
+		sets: [
+			// TODO
+		]
 	};
 }

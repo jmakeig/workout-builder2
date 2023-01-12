@@ -43,6 +43,14 @@ export function named(validation, name) {
 	return validation.filter((v) => name === v.for);
 }
 
+/** @typedef {HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement} FormElementsHTML */
+
+/**
+ *
+ * @param {FormElementsHTML} node
+ * @param {ValidationResult[]} validations
+ * @returns {void}
+ */
 function update_validation(node, validations) {
 	const { name } = node;
 	console.log(validations);
@@ -61,7 +69,12 @@ function update_validation(node, validations) {
 	//node.form?.reportValidity();
 }
 
-export function valid(node, initial) {
+/** @type {import('svelte/action').Action} */
+export function valid(
+	/** @type {FormElementsHTML} */
+	node,
+	initial
+) {
 	const { title } = node;
 	update_validation(node, initial);
 	return {

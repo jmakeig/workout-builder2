@@ -17,7 +17,21 @@ function delay(ms = 0) {
 /** @typedef { import('$lib/types').Workout } Workout */
 
 /** @type {Workout[]} */
-const data = [{ name: 'uno', title: 'Uno', description: '', sets: [] }];
+const data = [
+	{
+		name: 'uno',
+		title: 'Uno',
+		description: '',
+		sets: [
+			[
+				{ exercise: 'jump', duration: 30 },
+				{ exercise: 'run', duration: 60 },
+				{ exercise: 'jumping-jack', duration: 30 }
+			],
+			[{ exercise: 'jump', duration: 15 }]
+		]
+	}
+];
 
 /**
  * `new` is used in the URL for new workouts
@@ -140,6 +154,7 @@ export const api = {
 		return workout;
 	},
 	async update_workout(workout) {
+		console.log('updating', workout);
 		const result = await db.update('UPDATE workouts WHERE name = $name', { workout });
 		if (undefined === result) {
 			throw new Error('Unexpected database response');

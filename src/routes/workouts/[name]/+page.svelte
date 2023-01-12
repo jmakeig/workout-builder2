@@ -9,8 +9,16 @@
 <p>{workout.description}</p>
 
 <h2>Sets</h2>
-{#each workout.sets as set}
-	{set.toString()}
-{/each}
+<table>
+	{#each workout.sets as set, s}
+		<tr><th scope="column" colspan="2">Set {s+1}</th></tr>
+		{#each set as exercise}
+			<tr>
+				<td>{exercise.exercise}</td>
+				<td>{exercise.duration}</td>
+			</tr>
+		{/each}
+	{/each}
+</table>
 
 <nav><ul><li><a href="/workouts">Workouts</a></li></ul></nav>

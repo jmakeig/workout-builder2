@@ -5,17 +5,16 @@
 	import { derived_async } from '$lib/state';
 	import { validate_workout, valid, named } from '$lib/validation';
 
-	// TODO: Do I even need this? It’s just on:input={evt => updater(evt.target.value)}.
-	//       Is the deep update logic generalizable?
-	
+	/** @typedef {import("$lib/types").Workout} Workout */
+
 	/**
-	 * @param {HTMLInputElement} node
-	 * @param {(value: any) => any} updater
+	 * @param {HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement } node
+	 * @param {(value: any) => void} updater
 	 * @returns {{destroy: () => void}}
 	 */
 	function deep(node, updater) {
 		function input_listener() {
-			return updater(node.value);
+			updater(node.value);
 		}
 		node.addEventListener('input', input_listener);
 		return {
@@ -43,22 +42,28 @@
 	};
 	*/
 
+	/** @type {import('./$types').PageData} */
 	export let data;
 
-	/** @typedef {import("$lib/types").Workout} Workout */
 	/** @type {import("svelte/store").Writable<Workout>} */
 	const workout = writable(data.workout);
 	//const validations = derived(workout, $w => []);
 	const validations = derived_async(workout, validate_workout);
 </script>
 
+<svelte:head>
+	<title>{['Workout', $workout.title].join(' • ')}</title>
+</svelte:head>
+
 <h2>Workout</h2>
 <pre>{JSON.stringify($workout, null, 2)}</pre>
+<pre>{JSON.stringify($validations, null, 2)}</pre>
 <!--
 <h2>FormData</h2>
 <pre>{qs}</pre>
 -->
-<form>
+<form method="post">
+	<input type="hidden" name="name" bind:value={$workout.name} />
 	<div class="control">
 		<label for="title">Title</label>
 		<input
@@ -91,7 +96,11 @@
 								<select
 									id="workout.sets[{s}][{e}].exercise"
 									name="workout.sets[{s}][{e}].exercise"
-									bind:value={exercise.exercise}
+									value={exercise.exercise}
+									use:deep={(v) => {
+										$workout.sets[s][e].exercise = v;
+										$workout.sets = [...$workout.sets];
+									}}
 								>
 									<option value="run">Run</option>
 									<option value="jump">Jump</option>
@@ -122,6 +131,9 @@
 			</table>
 		</fieldset>
 	{/each}
+	<div>
+		<button formaction="?/save" disabled={$validations?.length > 0}>Save</button>
+	</div>
 </form>
 
 <style>

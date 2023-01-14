@@ -25,9 +25,10 @@ export const actions = {
  */
 function to_workout_stub(formData) {
 	return {
-		/** @type any */
+		// @ts-ignore
 		title: formData.get('title'),
-		/** @type any */
-		description: formData.get('description')
+		// @ts-ignore
+		description: formData.get('description'),
+		sets: []
 	};
 }

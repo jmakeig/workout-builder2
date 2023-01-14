@@ -53,7 +53,7 @@ export function named(validation, name) {
  */
 function update_validation(node, validations) {
 	const { name } = node;
-	console.log(validations);
+	console.log('Validation errors updated for', node.name, validations?.length);
 	const my_validations = named(validations, name);
 	// ? becuase (I think) validations could be undefined in the tick before the Promise is resolved (?)
 	if (my_validations?.length > 0) {

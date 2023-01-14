@@ -98,7 +98,6 @@ const db = {
 					throw new ValidationError(`Workout ${params?.name} not found.`);
 				}
 				const validations = await validate_workout(params.workout);
-				console.log(validations);
 				if (validations.length > 0) {
 					throw new ValidationError('Nope', { cause: validations });
 				}

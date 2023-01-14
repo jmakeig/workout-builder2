@@ -6,6 +6,7 @@
 	import { validate_workout, valid, named } from '$lib/validation';
 
 	/** @typedef {import("$lib/types").Workout} Workout */
+	/** @typedef {import('$lib/validation').ValidationResult} ValidationResult */
 
 	/**
 	 * @param {HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement } node
@@ -24,24 +25,6 @@
 		};
 	}
 
-	/*
-	let data = {
-		workout: {
-			name: 'asdf',
-			title: 'Asdf',
-			description: 'Here is some long-form text to describe it.',
-			sets: [
-				[
-					{ exercise: 'jump', duration: 30 },
-					{ exercise: 'run', duration: 60 },
-					{ exercise: 'jumping-jack', duration: 30 }
-				],
-				[{ exercise: 'jump', duration: 15 }]
-			]
-		}
-	};
-	*/
-
 	/** @type {import('./$types').PageData} */
 	export let data;
 
@@ -50,8 +33,9 @@
 
 	/** @type {import("svelte/store").Writable<Workout>} */
 	const workout = writable(form?.workout ?? data.workout);
-	//const validations = derived(workout, $w => []);
-	const validations = derived_async(workout, validate_workout);
+	/** @type {import("svelte/store").Readable<ValidationResult[]>} */
+	// @ts-ignore
+	const validations = derived_async(workout, validate_workout, form?.validations);
 </script>
 
 <svelte:head>

@@ -45,8 +45,11 @@
 	/** @type {import('./$types').PageData} */
 	export let data;
 
+	/** @type {import('./$types').ActionData} */
+	export let form;
+
 	/** @type {import("svelte/store").Writable<Workout>} */
-	const workout = writable(data.workout);
+	const workout = writable(form?.workout ?? data.workout);
 	//const validations = derived(workout, $w => []);
 	const validations = derived_async(workout, validate_workout);
 </script>

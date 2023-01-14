@@ -1,4 +1,6 @@
-import { ConstraintViolationError, NotFoundError } from './impl';
+import { validate_workout } from '$lib/validation';
+import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
+import { ConstraintViolationError, NotFoundError, ValidationError } from './impl';
 
 const SIMULATED_DELAY = 250; // ms
 
@@ -19,8 +21,8 @@ function delay(ms = 0) {
 /** @type {Workout[]} */
 const data = [
 	{
-		name: 'uno',
-		title: 'Uno',
+		name: '15-minute-cardio',
+		title: '15-Minute Cardio',
 		description: '',
 		sets: [
 			[
@@ -91,6 +93,15 @@ const db = {
 			case 'UPDATE workouts WHERE name = $name':
 				// console.log('Updating', params.workout);
 				const index = data.findIndex((workout) => params.workout.name === workout.name);
+				// console.log(index);
+				if (index < 0) {
+					throw new ValidationError(`Workout ${params?.name} not found.`);
+				}
+				const validations = await validate_workout(params.workout);
+				console.log(validations);
+				if (validations.length > 0) {
+					throw new ValidationError('Nope', { cause: validations });
+				}
 				return (data[index] = params.workout);
 			case 'DELETE FROM workouts WHERE name = $name': {
 				const index = data.findIndex((workout) => params.name === workout.name);
@@ -154,8 +165,9 @@ export const api = {
 		return workout;
 	},
 	async update_workout(workout) {
-		console.log('updating', JSON.stringify(workout, null, 2));
+		// console.log('updating', JSON.stringify(workout, null, 2));
 		const result = await db.update('UPDATE workouts WHERE name = $name', { workout });
+		// console.log('SHOULDN’T SEE result', result);
 		if (undefined === result) {
 			throw new Error('Unexpected database response');
 		}

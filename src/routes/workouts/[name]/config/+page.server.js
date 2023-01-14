@@ -1,5 +1,10 @@
-import { error, redirect } from '@sveltejs/kit';
-import { api, NotFoundError, ValidationError } from '$lib/server/api/impl';
+import { error, fail, redirect } from '@sveltejs/kit';
+import {
+	api,
+	ConstraintViolationError,
+	NotFoundError,
+	ValidationError
+} from '$lib/server/api/impl';
 import { parse } from 'qs';
 
 /** @type {import('./$types').PageServerLoad} */
@@ -19,14 +24,32 @@ export async function load({ params }) {
 /** @type {import('./$types').Actions} */
 export const actions = {
 	async save({ request }) {
+		const workout = to_workout(await request.formData());
+		try {
+			const updated = await api.update_workout(workout);
+			// console.log('SUCCESFULLY UPDATED', updated);
+			throw redirect(303, `/workouts/${updated.name}`);
+		} catch (err) {
+			if (err instanceof ValidationError) {
+				// console.error('ValidationError ',  err.cause);
+				return fail(409, { workout, validations: err.cause });
+			}
+			// console.log('Wrong error', JSON.stringify(err));
+			throw err;
+		}
+		/*
 		return api
 			.update_workout(to_workout(await request.formData()))
 			.then((workout) => {
 				throw redirect(303, `/workouts/${workout.name}`);
 			})
 			.catch((error) => {
-				console.error('CAUGHT!', error);
+				if (error instanceof ValidationError) {
+					return fail(409, { workout, validations: error.cause });
+				}
+				console.log('Something else caught', error);
 			});
+			*/
 	},
 	async delete(event) {
 		await api.delete_workout(event.params.name);

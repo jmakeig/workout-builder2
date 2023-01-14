@@ -10,8 +10,10 @@ export interface Workout extends WorkoutStub {
 	/** Groups of exercises */
 	sets: ExerciseSet[];
 	// rest_duration: number;
+	created_at?: Date;
+	updated_at?: Date;
 }
-//Omit<Todo, "completed" | "createdAt">
+/** An unsaved Workout. The `name` and `updated_at` properties are set by the database. */
 export interface WorkoutStub extends Omit<Workout, "name"> {}
 
 interface ExerciseSet extends Array<ExerciseInstance> {}

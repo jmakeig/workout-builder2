@@ -16,9 +16,9 @@ export interface Workout extends WorkoutStub {
 /** An unsaved Workout. The `name` and `updated_at` properties are set by the database. */
 export interface WorkoutStub extends Omit<Workout, "name"> {}
 
-interface ExerciseSet extends Array<ExerciseInstance> {}
+export interface ExerciseSet extends Array<ExerciseInstance> {}
 
-interface ExerciseInstance {
+export interface ExerciseInstance {
 	exercise: string | Exercise;
 	/** Time to run the exercise in seconds  */
 	duration: number; // seconds

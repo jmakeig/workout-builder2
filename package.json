@@ -25,6 +25,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"qs": "^6.11.0"
+		"qs": "^6.11.0",
+		"xstate": "^4.37.0"
 	}
 }
